@@ -1,30 +1,76 @@
 ---
-title: "Fitness_Health_Analysis_DS2020"
+title: "Fitness and Health Analysis"
 author: "Adam Zhu and Bradyn Weaver"
 date: "2024-11-05"
 output: html_document
 ---
+### Data Description
+This dataset comprises synthetic data from fitness trackers, capturing users’ daily activities, exercise routines, heart rates, sleep patterns, and calorie intake. It is intended for analyzing health and fitness trends, optimizing workout plans, and encouraging healthy lifestyle habits.
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+### First Data Cleaning Steps
+To clean the dataset, we started by loading and reviewing the data structure, checking for duplicate rows and missing values to ensure completeness. We converted the date column to a datetime format to standardize data types and facilitate time-based analysis. Outliers in key numeric columns like steps, calories_burned, heart_rate_avg, and sleep_hours were detected using the IQR method to identify potential anomalies. These steps ensured that the data was accurate, consistent, and ready for further analysis or modeling.
+
+```{r}
+library(dplyr)
+
+data <- read.csv("fitness_tracker_dataset.csv")
+
+# Check the structure of the dataset
+str(data)
+
+# Check for duplicate rows
+duplicates <- sum(duplicated(data))
+cat("Number of duplicate rows:", duplicates, "\n")
+
+# Check for missing values in each column
+missing_values <- sapply(data, function(x) sum(is.na(x)))
+cat("Missing values per column:\n")
+print(missing_values)
+
+# Convert 'date' column to Date format
+data$date <- as.Date(data$date, format = "%Y-%m-%d")
+
+# detect outliers using the IQR method
+detect_outliers <- function(data, column) {
+  Q1 <- quantile(data[[column]], 0.25, na.rm = TRUE)
+  Q3 <- quantile(data[[column]], 0.75, na.rm = TRUE)
+  IQR <- Q3 - Q1
+  lower_bound <- Q1 - 1.5 * IQR
+  upper_bound <- Q3 + 1.5 * IQR
+  outliers <- data %>% filter(data[[column]] < lower_bound | data[[column]] > upper_bound)
+  return(outliers)
+}
+
+# Check for outliers in key numeric columns
+outlier_counts <- list(
+  steps = nrow(detect_outliers(data, "steps")),
+  calories_burned = nrow(detect_outliers(data, "calories_burned")),
+  heart_rate_avg = nrow(detect_outliers(data, "heart_rate_avg")),
+  sleep_hours = nrow(detect_outliers(data, "sleep_hours"))
+)
+
+cat("Outlier counts:\n")
+print(outlier_counts)
 ```
 
-## R Markdown
+### Marginal Summaries
+The marginal summaries provided an overview of key numeric columns in the dataset, revealing central tendencies and variability. We examined columns such as steps, calories_burned, distance_km, active_minutes, sleep_hours, and heart_rate_avg. The summary statistics, including mean, median, and quartiles, indicated the spread and typical values for each variable, highlighting potential outliers or unusual distributions. This analysis offered a foundational understanding of each variable’s distribution, aiding in further analysis or modeling.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r}
+marginal_summaries <- data %>%
+  select(steps, calories_burned, distance_km, active_minutes, sleep_hours, heart_rate_avg) %>%
+  summary()
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+print(marginal_summaries)
 ```
+### Questions to be addressed: Fleshed out project idea
+Exploring the relationships and correlations between environmental conditions, stimuli, and mood.
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+	1.	How do different weather conditions affect users’ reported mood?
+	2.	Is there a correlation between the type of workout (e.g., walking, cycling, swimming) and users’ mood?
+	3.	Does heart rate variability show any relationship with changes in mood under specific environmental conditions?
+	4.	What impact do high or low levels of physical activity have on mood in various weather scenarios?
+	5.	Are users more likely to report a positive mood after longer periods of active minutes or higher calorie expenditure?
+	6.	Does the amount of sleep influence mood differently depending on the environmental condition (e.g., clear, rainy, foggy)?
+	7.	What are the combined effects of weather and physical exertion on mood changes throughout the day?
+	8.	How does the location (e.g., park, office) correlate with mood under different stimuli and weather conditions?
