@@ -1,3 +1,4 @@
 DS2020: Adam and Bradyn's Final Project
 
 Fitness and Health Analysis
+This project involves analyzing a comprehensive dataset collected from fitness trackers, focusing on users’ daily activities, exercise routines, heart rates, sleep patterns, calorie consumption, and reported moods under various environmental conditions. The primary objective is to explore relationships and correlations between environmental factors (e.g., weather, location), physical stimuli (e.g., workout type, active minutes), and users’ mood. By understanding these interactions, the project aims to provide insights into how different conditions impact well-being and fitness outcomes. The analysis includes data cleaning, marginal summaries, correlation analysis, and visualization of trends, enabling deeper understanding and informed decision-making in health and lifestyle optimization.
